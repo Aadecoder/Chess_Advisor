@@ -2,6 +2,8 @@ from inference import get_model
 import cv2 as cv
 import supervision as sv
 import numpy as np
+import chess
+import chess.engine
 
 # Import the YOLO Model for Chess Piece Detection
 model = get_model(model_id="chess.comdetection/4", api_key="API_KEY")
@@ -117,6 +119,33 @@ def board_to_fen(fen_board):
 fen_string = board_to_fen(fen_board)
 print(f"\nGenerated FEN: {fen_string}")
 
+try:
+    board = chess.Board(fen_string)
+    print(f"FEN Validation SUCCESS")
+    print(f"Board is valid: {board.is_valid()}")
+    print(f"Board in ASCII:\n{board}")
+
+    # Engine Analysis
+    engine_path = "C:/Users/adity/Downloads/stockfish/stockfish-windows-x86-64-avx2.exe"
+    engine = chess.engine.SimpleEngine.popen_uci(engine_path)
+
+    # Get Multiple Best moves
+    info = engine.analyse(board, chess.engine.Limit(time=0.5),multipv=3)
+
+    if isinstance(info, list):
+        for i, line in enumerate(info):
+            if i < 3:
+                move = line['pv'][0]
+                print(f"Move {i+1}: {move} (Score: {line['score']})")
+    else:
+        move = info['pv'][0]
+        print(f"Best Move: {move} (Score: {info['score']})")
+    
+    engine.quit()
+
+except Exception as e:
+    print(f"FEN Validation: FAILED - {e}")
+    print("Please Check the piece detection and positioning")
 
 # Display Result
 sv.plot_image(annotated_image)
