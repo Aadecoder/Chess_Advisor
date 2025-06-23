@@ -9,7 +9,7 @@ import chess.engine
 model = get_model(model_id="chess.comdetection/4", api_key="API_KEY")
 
 # Image of the chess Board
-image = cv.imread(r"C:\Users\adity\OneDrive\Pictures\Screenshots\Screenshot 2025-06-15 174330.png")
+image = cv.imread(r"C:\Users\adity\OneDrive\Pictures\Screenshots\Screenshot 2025-06-22 030143.png")
 
 # Getting the results of piece detection
 results = model.infer(image=image)
@@ -132,13 +132,33 @@ try:
     # Get Multiple Best moves
     info = engine.analyse(board, chess.engine.Limit(time=0.5),multipv=3)
 
+    # Function to get square center coordinates
+    def square_center(square):
+        col = chess.square_file(square)
+        row = chess.square_rank(square)
+
+        # Converting these chess coordinates to image coordinates
+        x = int(top_left_x + (col + 0.5) * cell_width)
+        y = int(top_left_y + (7 - row + 0.5) * cell_height)
+        return (x,y)
+    
+    # Function to Draw Arrows for best moves
+    def draw_arrow(img, start_square, end_square, color, thickness=3):
+        start = square_center(start_square)
+        end = square_center(end_square)
+        cv.arrowedLine(img,start,end,color,thickness,tipLength=0.1)
+
+    colors = [(0,0,255),(255,0,0),(0,255,0)]
+
     if isinstance(info, list):
         for i, line in enumerate(info):
             if i < 3:
                 move = line['pv'][0]
+                draw_arrow(annotated_image, move.from_square, move.to_square,colors[i])
                 print(f"Move {i+1}: {move} (Score: {line['score']})")
     else:
         move = info['pv'][0]
+        draw_arrow(annotated_image, move.from_square, move.to_square, colors[0])
         print(f"Best Move: {move} (Score: {info['score']})")
     
     engine.quit()
