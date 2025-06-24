@@ -1,4 +1,4 @@
-from inference import get_model
+from ultralytics import YOLO
 import cv2 as cv
 import supervision as sv
 import numpy as np
@@ -6,16 +6,17 @@ import chess
 import chess.engine
 
 # Import the YOLO Model for Chess Piece Detection
-model = get_model(model_id="chess.comdetection/4", api_key="API_KEY")
+model = YOLO("Chess_Advisor/weights/chess_detection.pt") # Make sure to have the correct path for your .pt file
 
 # Image of the chess Board
 image = cv.imread(r"C:\Users\adity\OneDrive\Pictures\Screenshots\Screenshot 2025-06-22 030143.png")
 
 # Getting the results of piece detection
-results = model.infer(image=image)
+results = model(image)[0]
+class_names = model.names
 
 # Prepare Annotators
-detections = sv.Detections.from_inference(results[0])
+detections = sv.Detections.from_ultralytics(results)
 
 bounding_box_annotator = sv.BoxAnnotator()
 label_annotator = sv.LabelAnnotator()
@@ -24,16 +25,21 @@ annotated_image = bounding_box_annotator.annotate(scene=image.copy(),detections=
 annotated_image = label_annotator.annotate(scene=annotated_image,detections=detections)
 
 # Detecting Board
-board_detection = next(pred for pred in results[0].predictions if pred.class_name == "board")
+board_box = None
+for box in results.boxes:
+    cls_id = int(box.cls[0])
+    if class_names[cls_id] == "board":
+        board_box = box
+        break
 
-board_x, board_y = board_detection.x, board_detection.y
-board_w, board_h = board_detection.width, board_detection.height
+if board_box is None:
+    raise ValueError("No board detected in the image")
 
-top_left_x = board_x - (board_w / 2)
-top_left_y = board_y - (board_h / 2)
-
-cell_width = board_w / 8
-cell_height = board_h / 8
+cx, cy, w, h = board_box.xywh[0].cpu().numpy()
+top_left_x = cx - (w / 2)
+top_left_y = cy - (h / 2)
+cell_width = w / 8
+cell_height = h / 8
 
 # Initialize a 8x8 board matrix representing an empty chess board
 fen_board = np.full((8, 8), "", dtype=object)
@@ -45,41 +51,27 @@ piece_map = {
 }
 
 # Assign each piece to closest cell center
-detected_pieces = []
-for pred in results[0].predictions:
-    if pred.class_name == "board":
+for box in results.boxes:
+    cls_id = int(box.cls[0])
+    class_name = class_names[cls_id]
+    if class_name == "board":
         continue
-    
-    # Center coordinates of the detected piece
-    piece_cx, piece_cy = pred.x, pred.y
 
-    # Relative position of the piece with the board
-    rel_x = piece_cx - top_left_x # Distance from the left corner of the board
-    rel_y = piece_cy - top_left_y # Distance from the top corner of the board
-
-    # Convert to Grid Coordinates
-    col = int(rel_x / cell_width) 
+    cx, cy, _, _ = box.xywh[0].cpu().numpy()
+    rel_x = cx - top_left_x
+    rel_y = cy - top_left_y
+    col = int(rel_x / cell_width)
     row = int(rel_y / cell_height)
 
-    # Clamp to Board Limits
-    col = min(max(col, 0), 7)
-    row = min(max(row, 0), 7)
+    # clamping to the board
+    col = min(max(col, 0),7)
+    row = min(max(row, 0),7)
 
-    # Actual Position in chess board in chess notation
-    chess_square = f"{chr(97 + col)}{8 - row}" # for example for (0,0) it gives a8
+    if class_name in piece_map:
+        fen_board[row][col] = piece_map[class_name]
 
-    #store information of pieces
-    detected_pieces.append({
-        'piece': pred.class_name,
-        'image_pos': (piece_cx, piece_cy),
-        'grid_pos':(row,col),
-        'chess_square': chess_square,
-        'confidence': pred.confidence        
-    })
-
-    # Place pieces in FEN Board matrix
-    if pred.class_name in piece_map:
-        fen_board[row][col] = piece_map[pred.class_name]
+    square = f"{chr(97 + col)}{8 - row}"
+    cv.putText(annotated_image, square, (int(cx - 10), int(cy - 10)), cv.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 1)
 
 # Convert FEN Board Matrix to FEN Notation
 

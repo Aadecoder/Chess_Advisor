@@ -1,4 +1,4 @@
-# ♟️ Chess Move Predictor
+# ♟️ Chess Advisor
 
 A computer vision-based chess assistant that detects chessboard using YOLO, converts the board state into a FEN string, and then uses the Stockfish chess engine to suggest the top moves with visual arrows overlayed on the board.
 
@@ -23,11 +23,9 @@ A computer vision-based chess assistant that detects chessboard using YOLO, conv
 - Install required libraries using pip:
 
 ```bash
-pip install opencv-python python-chess supervision
+pip install opencv-python python-chess supervision ultralytics
 ```
 - Download Stockfish engine for Windows from: https://stockfishchess.org/download/
-
-- Get your Roboflow API key for the YOLO model hosted on Roboflow.
 
 ---
 
@@ -36,13 +34,9 @@ pip install opencv-python python-chess supervision
 - Replace the image path in the code with your screenshot or board image:
 
 ```python
-image = cv2.imread(r"C:\path\to\your\chess_image.png")
+image = cv.imread(r"C:\path\to\your\chess_image.png")
 ```
-- Replace the model_id and api_key in this line with your Roboflow details:
 
-```python
-model = get_model(model_id="chess.comdetection/4", api_key="your_api_key_here")
-```
 - Make sure the Stockfish binary path is correct:
 
 ```python
@@ -55,11 +49,23 @@ python main.py
 ```
 ---
 
+## Directory Structure
+
+```bash
+Chess_Advisor/
+├── weights/
+│   └── chess_detection.pt
+├── main.py
+└── README.md
+```
+
+---
+
 ## 💡 How It Works
 
 - Image Input: Loads the board image.
 
-- Piece Detection: Uses YOLO model via Roboflow to detect all pieces and the board.
+- Piece Detection: Uses YOLO model to detect all pieces and the board.
 
 - Grid Mapping: Divides board into 8x8 grid and maps each piece to its respective square.
 
@@ -85,9 +91,8 @@ python main.py
 
 ## 🙏 Acknowledgements
 
-- [Roboflow](https://roboflow.com) – for providing the YOLO model inference API.
 - [Stockfish](https://stockfishchess.org) – for the powerful chess engine used to generate move suggestions.
-- Python libraries: `python-chess`, `opencv-python`, `supervision`, and `inference` – for enabling the core functionality of this project.
+- Python libraries: `python-chess`, `opencv-python`, `supervision`, and `ultralytics` – for enabling the core functionality of this project.
 
 ---
 
