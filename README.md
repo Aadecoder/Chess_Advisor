@@ -31,12 +31,6 @@ pip install opencv-python python-chess supervision ultralytics
 
 ## 🚀 How to Run
 
-- Replace the image path in the code with your screenshot or board image:
-
-```python
-image = cv.imread(r"C:\path\to\your\chess_image.png")
-```
-
 - Make sure the Stockfish binary path is correct:
 
 ```python
