@@ -43,7 +43,7 @@ while(1):
     if board_box is None:
         raise ValueError("No board detected in the image")
 
-    cx, cy, w, h = board_box.xywh[0].cpu().numpy()
+    cx, cy, w, h = board_box.xywh[0].numpy()
     top_left_x = cx - (w / 2)
     top_left_y = cy - (h / 2)
     cell_width = w / 8
@@ -173,5 +173,3 @@ while(1):
 
     # Display Result
     sv.plot_image(annotated_image)
-    # cv.waitKey(0)
-    # cv.destroyAllWindows()
