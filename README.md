@@ -8,7 +8,8 @@ A computer vision-based chess assistant that detects chessboard using YOLO, conv
 
 ## 🔍 Features
 
-- Detects chessboard and pieces from an image using YOLO.
+- Captures a specified portion of the screen using mss.
+- Detects chessboard and pieces from the captured image using YOLO.
 - Converts detected pieces into an accurate FEN string.
 - Uses `python-chess` to validate the board state and interface with Stockfish.
 - Renders best moves as colored arrows using OpenCV.
@@ -23,7 +24,7 @@ A computer vision-based chess assistant that detects chessboard using YOLO, conv
 - Install required libraries using pip:
 
 ```bash
-pip install opencv-python python-chess supervision ultralytics
+pip install opencv-python numpy python-chess supervision ultralytics mss keyboard
 ```
 - Download Stockfish engine for Windows from: https://stockfishchess.org/download/
 
@@ -34,8 +35,25 @@ pip install opencv-python python-chess supervision ultralytics
 - Make sure the Stockfish binary path is correct:
 
 ```python
-engine_path = "C:/path/to/stockfish.exe"
+ENGINE_PATH = "C:/path/to/stockfish.exe"
 ```
+
+- Make sure that the monitor dimensions and placement is same as the actual chess board
+
+```python
+monitor = {"top": 143, "left": 49, "width": 870, "height": 870}
+```
+
+- To accurately align chessboard placement to monitor you can use a Power Toys tool called Screen Ruler
+
+- top : distance of the chess board from the top of the screen in pixels 
+
+- left : distance of the chess board from the left of the screen in pixels
+
+- width : width of the chess board in pixels
+
+- height : height of the chess board in pixels
+
 - Run the script:
 
 ```bash
@@ -57,7 +75,7 @@ Chess_Advisor/
 
 ## 💡 How It Works
 
-- Image Input: Loads the board image.
+- Captures the Chess Board : Uses MSS model to capture the image of the chess board on the screen
 
 - Piece Detection: Uses YOLO model to detect all pieces and the board.
 
@@ -86,7 +104,7 @@ Chess_Advisor/
 ## 🙏 Acknowledgements
 
 - [Stockfish](https://stockfishchess.org) – for the powerful chess engine used to generate move suggestions.
-- Python libraries: `python-chess`, `opencv-python`, `supervision`, and `ultralytics` – for enabling the core functionality of this project.
+- Python libraries: `python-chess`, `numpy`, `opencv-python`, `supervision`, `mss`, `keyboard` and `ultralytics` – for enabling the core functionality of this project.
 
 ---
 
