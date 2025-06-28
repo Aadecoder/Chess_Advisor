@@ -14,6 +14,7 @@ A computer vision-based chess assistant that detects chessboard using YOLO, conv
 - Uses `python-chess` to validate the board state and interface with Stockfish.
 - Renders best moves as colored arrows using OpenCV.
 - Displays suggested moves and their scores from the Stockfish engine.
+- Red Arrow is equivalent to best move then Blue arrow and finally Green
 
 ---
 
