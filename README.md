@@ -99,6 +99,8 @@ Chess_Advisor/
 
 - Not tested on real-world photos or noisy boards.
 
+- Only works if you play as white.
+
 ---
 
 ## 🙏 Acknowledgements
