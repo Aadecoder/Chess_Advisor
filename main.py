@@ -8,7 +8,7 @@ import mss
 import keyboard
 
 # --- CONFIGURATION ---
-MODEL_PATH = r"D:\PROGRAMMING\Projects\Chess_Advisor\weights\chess_detection.pt"
+MODEL_PATH = "Chess_Advisor/weights/chess_detection.pt"
 ENGINE_PATH = "C:/Users/adity/Downloads/stockfish/stockfish-windows-x86-64-avx2.exe"
 
 # Load model
@@ -68,7 +68,8 @@ with mss.mss() as sct:
                     break
 
             if board_box is None:
-                raise ValueError("No board detected in the image")
+                print("[ERROR] No board detected.")
+                continue
 
             cx, cy, w, h = board_box.xywh[0].numpy()
             top_left_x = cx - (w / 2)
@@ -158,11 +159,11 @@ with mss.mss() as sct:
                     for i, line in enumerate(info):
                         if i < 3:
                             move = line['pv'][0]
-                            draw_arrow(annotated_image, move.from_square, move.to_square,colors[i])
+                            draw_arrow(annotated_image, move.from_square, move.to_square,colors[i],top_left_x, top_left_y, cell_width, cell_height)
                             print(f"Move {i+1}: {move} (Score: {line['score']})")
                 else:
                     move = info['pv'][0]
-                    draw_arrow(annotated_image, move.from_square, move.to_square, colors[0])
+                    draw_arrow(annotated_image, move.from_square, move.to_square, colors[0],top_left_x, top_left_y, cell_width, cell_height)
                     print(f"Best Move: {move} (Score: {info['score']})")
                 
                 engine.quit()
