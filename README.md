@@ -38,6 +38,12 @@ pip install opencv-python numpy python-chess supervision ultralytics mss keyboar
 ENGINE_PATH = "C:/path/to/stockfish.exe"
 ```
 
+- Make sure the YOLO Model path is correct:
+
+```python
+MODEL_PATH = "C:/path/to/chess_detection.pt"
+```
+
 - Make sure that the monitor dimensions and placement is same as the actual chess board
 
 ```python
